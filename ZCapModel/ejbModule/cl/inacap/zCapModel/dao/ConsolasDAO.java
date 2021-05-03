@@ -47,7 +47,7 @@ public class ConsolasDAO implements ConsolasDAOLocal {
 	public List<Consola> filterByName(String nombre) {
 		
 		// CON STREAM RECORREMOS LA LISTA DE CONSOLAS, FILTRAMOS POR CADA NOMBRE DE CONSOLA QUE CONTENGA EL NOMBRE, COLECCIONALO EN UNA LISTA DE COLECCION;
-		return consolas.stream().filter(c->c.getNombre().contains(nombre)).collect(Collectors.toList());
+		return consolas.stream().filter(c->c.getNombre().toLowerCase().contains(nombre.toLowerCase())).collect(Collectors.toList());
 	}
 
 }
