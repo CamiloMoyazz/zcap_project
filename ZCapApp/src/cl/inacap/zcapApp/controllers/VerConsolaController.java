@@ -40,9 +40,20 @@ public class VerConsolaController extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
+		
+		if(request.getParameter("nombreEliminar") != null) {
+			String nombre = request.getParameter("nombreEliminar".trim());
+			List<Consola> busqueda = consolasDAO.filterByName(nombre);
+			
+			Consola consolaAEliminar = busqueda.isEmpty()? null:busqueda.get(0);
+			if(consolaAEliminar != null) {
+				consolasDAO.delete(consolaAEliminar);
+			}
+		}
+		
 		List<Consola> consolas = consolasDAO.getAll();
 		
-		request.setAttribute("lista", consolas);
+		request.setAttribute("consolas", consolas);
 			
 		//ESTO NOS LANZA LA VISTA AL MOMENTO DE RECIBIR UN GET
 		request.getRequestDispatcher("WEB-INF/vistas/verConsolas.jsp").forward(request, response);

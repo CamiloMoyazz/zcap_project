@@ -39,8 +39,8 @@
 					<div class="navbar-item has-dropdown is-hoverable">
 						<a class="navbar-link"> Juegos </a>
 						<div class="navbar-dropdown">
-							<a class="navbar-item"> Ingresar </a>
-							<a class="navbar-item"> Ver Juegos </a>
+							<a class="navbar-item" href="AgregarJuegoController.do"> Ingresar </a>
+							<a class="navbar-item" href="VerJuegosController.do"> Ver Juegos </a>
 						</div>
 					</div>
 				</div>

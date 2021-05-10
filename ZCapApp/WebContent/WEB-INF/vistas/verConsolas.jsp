@@ -9,8 +9,8 @@
 	<div class="columns mt-6 is-centered">
 		<div class="column mt-6 is-half ">
 			<table class="table is-striped is-hoverable is-fullwidth is-bordered ">
-				<thead>
-					<tr class="has-background-primary">
+				<thead class="has-background-primary">
+					<tr>
 						<th>Nombre</th>
 						<th>Marca</th>
 						<th>Año de Lanzamiento</th>
@@ -18,17 +18,15 @@
 					</tr>
 				</thead>
 				<tbody>
-				<c:forEach items="${lista}" var="item">					
-					<tr>
-						<td>${item.nombre}</td>
-						<td>${item.marca}</td>
-						<td>${item.lanzamiento}</td>
-						<td><a class="has-text-danger">Eliminar</a></td>
-					</tr>
-				</c:forEach>
-				<tr>
-					<td>AHHHH</td>
-				</tr>
+					<c:forEach var="consola" items="${consolas}">				
+						<tr>
+							<td>${consola.nombre}</td>
+							<td>${consola.marca}</td>
+							<td>${consola.lanzamiento}</td>
+							<td><a href="VerConsolaController.do?nombreEliminar=${consola.nombre}" 
+							class="has-text-danger">Eliminar</a></td>
+						</tr>
+					</c:forEach>
 				</tbody>
 			</table>
 		</div>
