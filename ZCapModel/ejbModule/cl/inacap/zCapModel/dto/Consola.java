@@ -38,5 +38,8 @@ public class Consola {
 		this.lanzamiento = lanzamiento;
 	}
 	
-	
+	public String toString() {
+		return this.nombre;
+		
+	}
 }

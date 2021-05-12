@@ -3,6 +3,7 @@ package cl.inacap.zcapApp.controllers;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -12,7 +13,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import cl.inacap.zCapModel.dao.ConsolasDAO;
 import cl.inacap.zCapModel.dao.ConsolasDAOLocal;
 import cl.inacap.zCapModel.dao.JuegosDAOLocal;
 import cl.inacap.zCapModel.dto.Consola;
@@ -24,29 +24,31 @@ import cl.inacap.zCapModel.dto.Juego;
 @WebServlet("/AgregarJuegoController.do")
 public class AgregarJuegoController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	
+
 	@Inject
 	private ConsolasDAOLocal consolasDAO;
-	
+
 	@Inject
 	private JuegosDAOLocal juegosDAO;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public AgregarJuegoController() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#HttpServlet()
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
+	public AgregarJuegoController() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
 		List<Consola> consolas = consolasDAO.getAll();
 		request.setAttribute("consolas", consolas);
-		
+
 		request.getRequestDispatcher("WEB-INF/vistas/agregarJuegos.jsp").forward(request, response);
 	}
 
@@ -55,42 +57,91 @@ public class AgregarJuegoController extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
+		List<String> errores = new ArrayList<>();
+		
+		//NOMBRE Y VALIDACION
 		String nombreTxt = request.getParameter("nombre-txt".trim());
+		if(nombreTxt.isEmpty()) {
+			errores.add("Error al Ingresar el Nombre");
+		}
+		
+		//DESCRIPCION Y VALIDACION
 		String descripcionTxt = request.getParameter("descripcion-txt".trim());
+		if(descripcionTxt.isEmpty()) {
+			errores.add("Debe ingresar una Descripción Valida");
+		}
+		
+		//CONSOLA Y VALIDACION
 		String consolaTxt = request.getParameter("consola-select".trim());
+		if(consolaTxt.isEmpty()) {
+			errores.add("Debe Seleccionar una Consola");
+		}
+		
+		//APTO Y VALIDACION
 		String aptoTxt = request.getParameter("apto-radio".trim());
+		if(aptoTxt.isEmpty()) {
+			errores.add("Seleccione si es APTO");
+		}
+		
+		//PRECIO Y VALIDACION JUNTO A TRY CATCH
 		String precioTxt = request.getParameter("precio-txt".trim());
-		String fechaTxt = request.getParameter("fecha-txt".trim());
-		int precio=0;
+		
+		int precio = 0;
+		if(precioTxt.isEmpty()) {
+			errores.add("Debe ingresar un Precio Valido");
+		}else {
+			try {
+				precio = Integer.parseInt(precioTxt);
+			}catch(Exception ex) {
+				errores.add("Debe ingresar un Precio Valido");
+			}
+		}
+		
 		Consola consola = null;
-		LocalDate fecha;
-		
-		//PARA CONVERTIR LAS FECHAS DESDE Y HACIA TEXTO
-		DateTimeFormatter formater = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		fecha = LocalDate.parse(fechaTxt,formater);
-		
 		List<Consola> consolasFiltradas = consolasDAO.filterByName(consolaTxt);
 		
 		if(!consolasFiltradas.isEmpty()) {
 			consola = consolasFiltradas.get(0);
 		}
 		
+		
+			Juego juego = new Juego();
+			juego.setNombre(nombreTxt);
+			juego.setDescripcion(descripcionTxt);
+			juego.setConsola(consola);
+			juego.setApto(aptoTxt.equals("si")); // Si hay un SI se guarda un TRUE y es un NO se guarda FALSE
+			juego.setPrecio(precio);
+			
+		
+		
+		//FECHA Y VALIDACION JUNTO A TRY CATCH
+		String fechaTxt = request.getParameter("fecha-txt".trim());
+		if(fechaTxt.isEmpty()) {
+			errores.add("Seleccione una Fecha");
+		}else {
+			try {
+				
+				LocalDate fecha;
+				//PARA CONVERTIR LAS FECHAS DESDE Y HACIA TEXTO
+				DateTimeFormatter formater = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+				fecha = LocalDate.parse(fechaTxt,formater);
+				
+				juego.setFechaLanzamiento(fecha);
+				
+			}catch(Exception ex) {
+				errores.add("Seleccione una Fecha Valida");
+			}
+		}
+		
 		//TODO: SI LA CONSOLA LLEGA NULL ACA, HAY QUE MANDAR UN MENSAJE DE ERROR
-		//TODO: VALIDAR QUE EL PRECIO SE UN NUMERO MAYOR A 0
 		
-		precio = Integer.parseInt(precioTxt);
+		if(!errores.isEmpty()) {
+			request.setAttribute("errores", errores);
+		}else {
+			juegosDAO.save(juego);
+			request.setAttribute("mensaje", "Juego Registrado!");
+		}
 
-		Juego juego = new Juego();
-		juego.setNombre(nombreTxt);
-		juego.setDescripcion(descripcionTxt);
-		juego.setConsola(consola);
-		juego.setApto(aptoTxt.equals("si")); // Si hay un SI se guarda un TRUE y es un NO se guarda FALSE
-		juego.setPrecio(precio);
-		juego.setFechaLanzamiento(fecha);
-		
-		juegosDAO.save(juego);
-
-		request.setAttribute("mensaje", "Juego Registrado!");
 		
 		
 		// TODO Auto-generated method stub

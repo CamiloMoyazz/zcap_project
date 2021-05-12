@@ -29,21 +29,25 @@
 				<thead class="has-background-primary">
 					<tr>
 						<th>Nombre</th>
+						<th>Descripcion</th>
 						<th>Consola</th>
+						<th>Apto para Niños?</th>
 						<th>Precio</th>
 						<th>Fecha de Lanzamiento</th>
-						<th>Apto para Niños?</th>
 					</tr>
 				</thead>
 				<tbody>
+				<c:forEach var="juego" items="${juegos}">
 					<tr>
-						<td>1</td>
-						<td>2</td>
-						<td>3</td>
-						<td>3</td>
-						<td>2</td>
-
+						<td>${juego.nombre}</td>
+						<td>${juego.descripcion}</td>
+						<td>${juego.consola}</td>
+						<c:if test="${ juego.apto == true }"><td>Apto</td></c:if>
+						<c:if test="${ juego.apto == false }"><td>No Apto</td></c:if>
+						<td>$${juego.precio}</td>
+						<td>${juego.fechaLanzamiento}</td>
 					</tr>
+				</c:forEach>
 				</tbody>
 			</table>
 		</div>
